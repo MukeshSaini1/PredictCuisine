@@ -42,10 +42,8 @@ def show_results(result_df, selected_ingredients):
     result_dict = result_df.T.to_dict()[0]
 
     # Display the results in a larger table
-    st.write("**Prediction Results:**")
     result_table = pd.DataFrame(list(result_dict.items()), columns=['Cuisine', 'Probability'])
     result_table['Probability'] = result_table['Probability'] * 100
-    st.dataframe(result_table.style.set_properties(**{'font-size': '20px'}))
 
     # Plot pie chart
     fig = px.pie(
@@ -55,11 +53,25 @@ def show_results(result_df, selected_ingredients):
         title='Cuisine Prediction Probability Distribution',
         color_discrete_sequence=px.colors.qualitative.Plotly
     )
-    st.plotly_chart(fig, use_container_width=True)
+
+    # Use st.expander to create a collapsible section
+    with st.expander("Show Prediction Results"):
+        st.dataframe(result_table.style.set_properties(**{'font-size': '20px'}))
+        st.plotly_chart(fig, use_container_width=True)
+
+        # Create a downloadable link for the results
+        csv = result_table.to_csv(index=False)
+        st.download_button(
+            label="Download Results as CSV",
+            data=csv,
+            file_name='cuisine_prediction_results.csv',
+            mime='text/csv'
+        )
 
     # Add "Predict Again" button
     if st.button('Predict Again'):
         st.experimental_rerun()
+
 
 
 def show_documentation():
